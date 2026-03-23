@@ -23,3 +23,4 @@ Tier Available RAM Strategy
 - Low < 850 MB Legacy hardware. Aggressive asset streaming and texture downscaling required.
 
 ---
+<img width="2132" height="1261" alt="image" src="https://github.com/user-attachments/assets/54b2c43a-1b21-43f3-925c-99c9ce96e066" />
