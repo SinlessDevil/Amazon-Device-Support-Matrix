@@ -1,232 +1,179 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Полная статистика девайсов Amazon Fire</title>
+    <title>Amazon Fire Device Analytics</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 20px; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 24px; border: 1px solid #e2e8f0; }
         
-        /* Стили для скроллбара таблицы */
         .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
-        .table-container::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
         .table-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .filter-btn.active { background-color: #1e3a8a; color: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
     </style>
 </head>
-<body class="p-4 md:p-8 text-gray-800">
+<body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto space-y-6">
         
-        <!-- Заголовок -->
-        <div class="text-center mb-8">
-            <h1 class="text-3xl md:text-4xl font-bold text-blue-900 mb-2">Amazon Ecosystem: Hardware Analytics</h1>
-            <p class="text-gray-600">Полная сводка по ОЗУ и CPU для планирования архитектуры проекта (ТВ, Планшеты, Auto)</p>
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-extrabold text-slate-900 mb-3 tracking-tight">Amazon Ecosystem: <span class="text-blue-700">Hardware Analytics</span></h1>
+            <p class="text-slate-500 max-w-2xl mx-auto text-lg">Comprehensive RAM & CPU breakdown for project architecture planning (TV, Tablets, Auto).</p>
         </div>
 
-        <!-- Карточки: Самые сильные и слабые -->
+        <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="card border-l-4 border-red-500">
-                <h3 class="text-sm text-gray-500 font-semibold uppercase">Критический минимум (ТВ)</h3>
-                <p class="text-xl font-bold mt-1">Fire TV Stick (1/2 Gen)</p>
-                <p class="text-sm text-gray-600 mt-2">ОЗУ: 1 ГБ (Свободно ~300 МБ)<br>Статус: Устарели</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Critical Minimum (TV)</h3>
+                <p class="text-xl font-bold mt-1">Fire TV Stick (G1/2)</p>
+                <p class="text-sm text-slate-500 mt-2">RAM: 1 GB (Free ~300 MB)<br><span class="text-red-600 font-semibold">Status: Obsolete</span></p>
             </div>
             <div class="card border-l-4 border-blue-500">
-                <h3 class="text-sm text-gray-500 font-semibold uppercase">Стандарт 2026 (ТВ)</h3>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">2026 Standard (TV)</h3>
                 <p class="text-xl font-bold mt-1">Fire TV Stick 4K / Max</p>
-                <p class="text-sm text-gray-600 mt-2">ОЗУ: 2 ГБ (Свободно ~1.1 ГБ)<br>Статус: Самая массовая база</p>
+                <p class="text-sm text-slate-500 mt-2">RAM: 2 GB (Free ~1.1 GB)<br><span class="text-blue-600 font-semibold">Status: Mainstream Base</span></p>
             </div>
             <div class="card border-l-4 border-purple-500">
-                <h3 class="text-sm text-gray-500 font-semibold uppercase">Стандарт 2026 (Планшеты)</h3>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">2026 Standard (Tablets)</h3>
                 <p class="text-xl font-bold mt-1">Fire HD 10 / HD 8 Plus</p>
-                <p class="text-sm text-gray-600 mt-2">ОЗУ: 3 ГБ (Свободно ~1.8 ГБ)<br>Статус: Рекомендованный таргет</p>
+                <p class="text-sm text-slate-500 mt-2">RAM: 3 GB (Free ~1.8 GB)<br><span class="text-purple-600 font-semibold">Status: Recommended Target</span></p>
             </div>
             <div class="card border-l-4 border-green-500">
-                <h3 class="text-sm text-gray-500 font-semibold uppercase">Флагманы экосистемы</h3>
-                <p class="text-xl font-bold mt-1">Fire Max 11 / Cube Gen 3</p>
-                <p class="text-sm text-gray-600 mt-2">ОЗУ: до 4 ГБ (Свободно ~2.6 ГБ)<br>Статус: Максимальная графика</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Flagship Tier</h3>
+                <p class="text-xl font-bold mt-1">Fire Max 11 / Cube G3</p>
+                <p class="text-sm text-slate-500 mt-2">RAM: Up to 4 GB (Free ~2.6 GB)<br><span class="text-green-600 font-semibold">Status: High Fidelity</span></p>
             </div>
         </div>
 
-        <!-- График -->
-        <div class="card w-full">
-            <div class="flex justify-between items-center mb-4">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800">Распределение памяти (Топ Актуальных Устройств)</h2>
-                    <p class="text-sm text-gray-600">Наглядный бюджет памяти (Memory Budget) для игры</p>
-                </div>
+        <!-- Memory Distribution Chart -->
+        <div class="card">
+            <div class="mb-6">
+                <h2 class="text-xl font-extrabold text-slate-800">Memory Distribution (Active Devices)</h2>
+                <p class="text-sm text-slate-500">Visualizing available Game Budget vs FireOS Overhead</p>
             </div>
             <div class="relative h-80 w-full">
                 <canvas id="ramChart"></canvas>
             </div>
         </div>
 
-        <!-- Таблица данных с фильтрами -->
-        <div class="card w-full">
-            <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+        <!-- Filterable Table -->
+        <div class="card">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-8 gap-4">
                 <div>
-                    <h2 class="text-xl font-bold text-gray-800">Полная база устройств</h2>
-                    <p class="text-sm text-gray-600">Оценка доступной оперативной памяти (Доступно = Total RAM - FireOS Overhead)</p>
+                    <h2 class="text-xl font-extrabold text-slate-800">Complete Device Database</h2>
+                    <p class="text-sm text-slate-500">Available RAM = Total RAM - FireOS Overhead</p>
                 </div>
                 
-                <!-- Фильтры -->
-                <div class="flex space-x-2 bg-gray-100 p-1 rounded-lg">
-                    <button onclick="filterTable('Все')" id="btn-Все" class="filter-btn px-4 py-2 text-sm font-medium rounded-md bg-white shadow text-gray-800 transition-all">Все</button>
-                    <button onclick="filterTable('ТВ')" id="btn-ТВ" class="filter-btn px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-800 hover:bg-white transition-all">Только ТВ</button>
-                    <button onclick="filterTable('Планшет')" id="btn-Планшет" class="filter-btn px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-800 hover:bg-white transition-all">Планшеты</button>
-                    <button onclick="filterTable('Прочее')" id="btn-Прочее" class="filter-btn px-4 py-2 text-sm font-medium rounded-md text-gray-600 hover:text-gray-800 hover:bg-white transition-all">Echo & Auto</button>
+                <div class="flex flex-wrap gap-2 bg-slate-100 p-1 rounded-xl">
+                    <button onclick="filterTable('All')" id="btn-All" class="filter-btn active px-5 py-2 text-xs font-bold rounded-lg transition-all uppercase">All</button>
+                    <button onclick="filterTable('TV')" id="btn-TV" class="filter-btn px-5 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">TV Devices</button>
+                    <button onclick="filterTable('Tablet')" id="btn-Tablet" class="filter-btn px-5 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Tablets</button>
+                    <button onclick="filterTable('Other')" id="btn-Other" class="filter-btn px-5 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Echo & Auto</button>
                 </div>
             </div>
             
             <div class="overflow-x-auto table-container" style="max-height: 600px;">
                 <table class="min-w-full text-left border-collapse relative">
-                    <thead class="sticky top-0 bg-gray-100 shadow-sm z-10">
-                        <tr class="text-gray-700 text-sm">
-                            <th class="p-3 border-b font-semibold">Категория</th>
-                            <th class="p-3 border-b font-semibold">Модель устройства</th>
-                            <th class="p-3 border-b font-semibold">CPU (Примерно)</th>
-                            <th class="p-3 border-b font-semibold">ОЗУ (Всего)</th>
-                            <th class="p-3 border-b font-semibold text-green-600 bg-green-50">Лимит для Игры (Свободно)</th>
-                            <th class="p-3 border-b font-semibold">Рекомендация</th>
+                    <thead class="sticky top-0 bg-slate-50 shadow-sm z-10">
+                        <tr class="text-slate-500 text-[10px] uppercase tracking-widest font-black">
+                            <th class="p-4 border-b">Category</th>
+                            <th class="p-4 border-b">Device Model</th>
+                            <th class="p-4 border-b">CPU Specs</th>
+                            <th class="p-4 border-b">Total RAM</th>
+                            <th class="p-4 border-b text-green-700 bg-green-50">Game Budget (Free)</th>
+                            <th class="p-4 border-b">Recommendation</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody" class="text-sm text-gray-700">
-                        <!-- Данные вставляются через JS -->
+                    <tbody id="tableBody" class="text-sm text-slate-700">
                     </tbody>
                 </table>
             </div>
         </div>
-
     </div>
 
     <script>
-        // ПОЛНАЯ БАЗА УСТРОЙСТВ ИЗ СПИСКА ПОЛЬЗОВАТЕЛЯ
         const devices = [
-            // === СЕМЕЙСТВО FIRE TV ===
-            { type: 'ТВ', name: 'Fire TV (1st Gen)', cpu: 'Quad-core Krait 300', ramTotal: 2048, ramAvail: 1100, rec: 'Устарел' },
-            { type: 'ТВ', name: 'Fire TV (2nd Gen)', cpu: 'Quad-core MediaTek', ramTotal: 2048, ramAvail: 1100, rec: 'Устарел' },
-            { type: 'ТВ', name: 'Amazon Fire TV (3rd Gen / Pendant)', cpu: 'Quad-core Amlogic', ramTotal: 2048, ramAvail: 1100, rec: 'Слабый (Но жив)' },
-            { type: 'ТВ', name: 'Fire TV Stick (1st Gen)', cpu: 'Dual-core Broadcom', ramTotal: 1024, ramAvail: 300, rec: 'Не поддерживать' },
-            { type: 'ТВ', name: 'Fire TV Stick (2nd Gen / with Alexa)', cpu: 'Quad-core MediaTek', ramTotal: 1024, ramAvail: 350, rec: 'Не поддерживать' },
-            { type: 'ТВ', name: 'Fire TV Stick (3rd Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 1024, ramAvail: 450, rec: 'Оптимизировать (Low)' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K Select / Lite', cpu: 'Quad-core 1.7 GHz', ramTotal: 1024, ramAvail: 450, rec: 'Оптимизировать (Low)' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K (1st Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 1536, ramAvail: 750, rec: 'База пользователей' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K (2nd Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Таргет 2026' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K Plus', cpu: 'Quad-core (Аналог Max)', ramTotal: 2048, ramAvail: 1100, rec: 'Таргет 2026' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K Max (1st Gen)', cpu: 'Quad-core 1.8 GHz', ramTotal: 2048, ramAvail: 1150, rec: 'Таргет 2026' },
-            { type: 'ТВ', name: 'Fire TV Stick 4K Max (2nd Gen)', cpu: 'Quad-core 2.0 GHz', ramTotal: 2048, ramAvail: 1200, rec: 'Таргет 2026' },
-            { type: 'ТВ', name: 'Fire TV Cube (1st Gen)', cpu: 'Quad-core 1.5 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'База пользователей' },
-            { type: 'ТВ', name: 'Fire TV Cube (2nd Gen)', cpu: 'Hexa-core 2.2 GHz', ramTotal: 2048, ramAvail: 1150, rec: 'Хорошая производительность' },
-            { type: 'ТВ', name: 'Fire TV Cube (3rd Gen)', cpu: 'Octa-core 2.2 GHz', ramTotal: 2048, ramAvail: 1200, rec: 'Флагман ТВ' },
-            { type: 'ТВ', name: 'Fire TV Smart TV (Обобщенно)', cpu: 'Зависит от вендора', ramTotal: 2048, ramAvail: 1000, rec: 'Таргет 2026 (Mid-range)' },
-            { type: 'ТВ', name: 'Fire TV Edition TV', cpu: 'Разные (Обычно Quad-core)', ramTotal: 1536, ramAvail: 700, rec: 'База пользователей' },
+            // === FIRE TV FAMILY ===
+            { type: 'TV', name: 'Fire TV (1st Gen)', cpu: 'Quad-core Krait 300', ramTotal: 2048, ramAvail: 1100, rec: 'Obsolete' },
+            { type: 'TV', name: 'Fire TV (2nd Gen)', cpu: 'Quad-core MediaTek', ramTotal: 2048, ramAvail: 1100, rec: 'Obsolete' },
+            { type: 'TV', name: 'Fire TV (3rd Gen / Pendant)', cpu: 'Quad-core Amlogic', ramTotal: 2048, ramAvail: 1100, rec: 'Weak (Legacy)' },
+            { type: 'TV', name: 'Fire TV Stick (1st Gen)', cpu: 'Dual-core Broadcom', ramTotal: 1024, ramAvail: 300, rec: 'Unsupported' },
+            { type: 'TV', name: 'Fire TV Stick (2nd Gen)', cpu: 'Quad-core MediaTek', ramTotal: 1024, ramAvail: 350, rec: 'Unsupported' },
+            { type: 'TV', name: 'Fire TV Stick (3rd Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 1024, ramAvail: 450, rec: 'Optimize (Low)' },
+            { type: 'TV', name: 'Fire TV Stick 4K Select / Lite', cpu: 'Quad-core 1.7 GHz', ramTotal: 1024, ramAvail: 450, rec: 'Optimize (Low)' },
+            { type: 'TV', name: 'Fire TV Stick 4K (1st Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 1536, ramAvail: 750, rec: 'Active Base' },
+            { type: 'TV', name: 'Fire TV Stick 4K (2nd Gen)', cpu: 'Quad-core 1.7 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Target 2026' },
+            { type: 'TV', name: 'Fire TV Stick 4K Max (1st Gen)', cpu: 'Quad-core 1.8 GHz', ramTotal: 2048, ramAvail: 1150, rec: 'Target 2026' },
+            { type: 'TV', name: 'Fire TV Stick 4K Max (2nd Gen)', cpu: 'Quad-core 2.0 GHz', ramTotal: 2048, ramAvail: 1200, rec: 'Target 2026' },
+            { type: 'TV', name: 'Fire TV Cube (2nd Gen)', cpu: 'Hexa-core 2.2 GHz', ramTotal: 2048, ramAvail: 1150, rec: 'High Performance' },
+            { type: 'TV', name: 'Fire TV Cube (3rd Gen)', cpu: 'Octa-core 2.2 GHz', ramTotal: 2048, ramAvail: 1200, rec: 'TV Flagship' },
 
-            // === УМНЫЕ ЭКРАНЫ И АВТО (Echo Show / In-Car) ===
-            { type: 'Прочее', name: 'Echo Show', cpu: 'Разные', ramTotal: 1024, ramAvail: 400, rec: 'Специфичный UI' },
-            { type: 'Прочее', name: 'Echo Show 15 (1st/2nd Gen)', cpu: 'Octa-core Amlogic', ramTotal: 3072, ramAvail: 1700, rec: 'Поддерживается' },
-            { type: 'Прочее', name: 'Echo Show 21', cpu: 'Octa-core', ramTotal: 4096, ramAvail: 2500, rec: 'Флагман (Экран)' },
-            { type: 'Прочее', name: 'In-Car Entertainment (Fire TV Built-in)', cpu: 'Аналог Stick 4K/Cube', ramTotal: 2048, ramAvail: 1100, rec: 'Автомобили' },
+            // === SMART DISPLAYS & AUTO ===
+            { type: 'Other', name: 'Echo Show 15 (Gen 2)', cpu: 'Octa-core Amlogic', ramTotal: 3072, ramAvail: 1700, rec: 'Supported' },
+            { type: 'Other', name: 'Echo Show 21', cpu: 'Octa-core', ramTotal: 4096, ramAvail: 2500, rec: 'Flagship Display' },
+            { type: 'Other', name: 'In-Car Entertainment (Fire TV)', cpu: 'Stick 4K/Cube Equivalent', ramTotal: 2048, ramAvail: 1100, rec: 'Automotive' },
 
-            // === СЕМЕЙСТВО ПЛАНШЕТОВ (Fire Tablet / Kindle) ===
-            // Новые планшеты
-            { type: 'Планшет', name: 'Fire Max 11', cpu: 'Octa-core 2.2 GHz', ramTotal: 4096, ramAvail: 2600, rec: 'Флагман Планшет' },
-            { type: 'Планшет', name: 'Fire HD 8 (2024)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Таргет 2026' },
-            { type: 'Планшет', name: 'Fire HD 10 (13th Gen)', cpu: 'Octa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Таргет 2026' },
-            { type: 'Планшет', name: 'Fire HD 8 Plus (12th Gen)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Таргет 2026' },
-            { type: 'Планшет', name: 'Fire HD 8 (12th Gen)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'База 2026' },
-            { type: 'Планшет', name: 'Fire 7 (12th Gen)', cpu: 'Quad-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'База 2026' },
-            { type: 'Планшет', name: 'Fire HD 10 (11th Gen)', cpu: 'Octa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1800, rec: 'Популярный' },
-            // Старые планшеты
-            { type: 'Планшет', name: 'Fire HD 8 (10th Gen)', cpu: 'Quad-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Популярный' },
-            { type: 'Планшет', name: 'Fire HD 10 (9th Gen)', cpu: 'Octa-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Поддерживается' },
-            { type: 'Планшет', name: 'Fire 7 (9th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1024, ramAvail: 400, rec: 'Слабый' },
-            { type: 'Планшет', name: 'Fire HD 8 (8th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1536, ramAvail: 750, rec: 'Слабый' },
-            { type: 'Планшет', name: 'Fire HD 10 (7th Gen)', cpu: 'Quad-core 1.8 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Поддерживается' },
-            { type: 'Планшет', name: 'Fire HD 8 (7th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1536, ramAvail: 750, rec: 'Слабый' },
-            { type: 'Планшет', name: 'Fire 7 (7th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1024, ramAvail: 400, rec: 'Не поддерживать' },
-            { type: 'Планшет', name: 'Fire HD 8 (6th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1536, ramAvail: 700, rec: 'Устарел' },
-            { type: 'Планшет', name: 'Fire HD 10 (Старые)', cpu: 'Разные', ramTotal: 1024, ramAvail: 400, rec: 'Устарел' },
-            { type: 'Планшет', name: 'Fire HD 8 (Старые)', cpu: 'Разные', ramTotal: 1024, ramAvail: 400, rec: 'Устарел' },
-            { type: 'Планшет', name: 'Fire (Базовый старый)', cpu: 'Разные', ramTotal: 1024, ramAvail: 400, rec: 'Устарел' },
-            // Эпоха HDX и старых Kindle
-            { type: 'Планшет', name: 'Fire HDX 8.9" (4th Gen)', cpu: 'Quad-core 2.5 GHz', ramTotal: 2048, ramAvail: 1000, rec: 'Устарел (Хороший CPU)' },
-            { type: 'Планшет', name: 'Fire HD 7', cpu: 'Quad-core', ramTotal: 1024, ramAvail: 350, rec: 'Не поддерживать' },
-            { type: 'Планшет', name: 'Fire HD 6', cpu: 'Quad-core', ramTotal: 1024, ramAvail: 350, rec: 'Не поддерживать' },
-            { type: 'Планшет', name: 'Kindle Fire HDX 8.9" (3rd Gen)', cpu: 'Quad-core 2.2 GHz', ramTotal: 2048, ramAvail: 1000, rec: 'Устарел' },
-            { type: 'Планшет', name: 'Kindle Fire HDX', cpu: 'Quad-core 2.2 GHz', ramTotal: 2048, ramAvail: 1000, rec: 'Устарел' },
-            { type: 'Планшет', name: 'Kindle Fire HD / HD 8.9"', cpu: 'Dual-core 1.5 GHz', ramTotal: 1024, ramAvail: 300, rec: 'Музейный экспонат' },
-            { type: 'Планшет', name: 'Kindle Fire (1st/Prev Gen)', cpu: 'Dual-core 1.0 GHz', ramTotal: 512, ramAvail: 150, rec: 'Музейный экспонат' }
+            // === TABLET FAMILY ===
+            { type: 'Tablet', name: 'Fire Max 11', cpu: 'Octa-core 2.2 GHz', ramTotal: 4096, ramAvail: 2600, rec: 'Tablet Flagship' },
+            { type: 'Tablet', name: 'Fire HD 10 (13th Gen)', cpu: 'Octa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Target 2026' },
+            { type: 'Tablet', name: 'Fire HD 8 (2024)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Target 2026' },
+            { type: 'Tablet', name: 'Fire HD 8 Plus (12th Gen)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1900, rec: 'Target 2026' },
+            { type: 'Tablet', name: 'Fire HD 8 (12th Gen)', cpu: 'Hexa-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Base 2026' },
+            { type: 'Tablet', name: 'Fire 7 (12th Gen)', cpu: 'Quad-core 2.0 GHz', ramTotal: 2048, ramAvail: 1100, rec: 'Base 2026' },
+            { type: 'Tablet', name: 'Fire HD 10 (11th Gen)', cpu: 'Octa-core 2.0 GHz', ramTotal: 3072, ramAvail: 1800, rec: 'Popular' },
+            { type: 'Tablet', name: 'Fire 7 (9th Gen)', cpu: 'Quad-core 1.3 GHz', ramTotal: 1024, ramAvail: 400, rec: 'Weak' },
+            { type: 'Tablet', name: 'Kindle Fire HDX 8.9"', cpu: 'Quad-core 2.5 GHz', ramTotal: 2048, ramAvail: 1000, rec: 'Obsolete (Strong CPU)' },
+            { type: 'Tablet', name: 'Kindle Fire (1st Gen)', cpu: 'Dual-core 1.0 GHz', ramTotal: 512, ramAvail: 150, rec: 'Museum' }
         ];
 
-        let currentFilter = 'Все';
-
-        // Функция отрисовки таблицы
         function renderTable(filter) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
+            const filtered = filter === 'All' ? devices : devices.filter(d => d.type === (filter === 'Other' ? 'Other' : filter));
             
-            const filteredDevices = filter === 'Все' ? devices : devices.filter(d => d.type === filter);
-
-            filteredDevices.forEach(dev => {
+            filtered.forEach(dev => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 transition-colors border-b border-gray-100";
+                tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100";
                 
-                // Бейджик категории
-                let typeClass = 'bg-gray-100 text-gray-800';
-                if(dev.type === 'ТВ') typeClass = 'bg-blue-100 text-blue-800';
-                if(dev.type === 'Планшет') typeClass = 'bg-purple-100 text-purple-800';
-                if(dev.type === 'Прочее') typeClass = 'bg-orange-100 text-orange-800';
+                let typeBadge = 'bg-slate-100 text-slate-800';
+                if(dev.type === 'TV') typeBadge = 'bg-blue-100 text-blue-800';
+                if(dev.type === 'Tablet') typeBadge = 'bg-purple-100 text-purple-800';
+                if(dev.type === 'Other') typeBadge = 'bg-orange-100 text-orange-800';
 
-                // Подсветка рекомендации
-                let recColor = 'text-gray-600';
-                if(dev.rec.includes('Устарел') || dev.rec.includes('Не поддерживать') || dev.rec.includes('Музейный')) recColor = 'text-red-500 font-semibold';
-                if(dev.rec.includes('Таргет') || dev.rec.includes('Флагман') || dev.rec.includes('Хорошая')) recColor = 'text-green-600 font-semibold';
-                if(dev.rec.includes('Оптимизировать') || dev.rec.includes('Слабый')) recColor = 'text-yellow-600 font-semibold';
+                let recClass = 'text-slate-600';
+                if(['Obsolete', 'Unsupported', 'Museum'].some(s => dev.rec.includes(s))) recClass = 'text-red-500 font-bold';
+                if(['Target', 'Flagship', 'Performance', 'Active'].some(s => dev.rec.includes(s))) recClass = 'text-green-600 font-bold';
+                if(['Optimize', 'Weak', 'Legacy'].some(s => dev.rec.includes(s))) recClass = 'text-amber-600 font-bold';
 
                 tr.innerHTML = `
-                    <td class="p-3">
-                        <span class="px-2 py-1 rounded text-xs font-bold ${typeClass}">${dev.type}</span>
-                    </td>
-                    <td class="p-3 font-medium text-gray-900">${dev.name}</td>
-                    <td class="p-3 text-gray-500 text-xs">${dev.cpu}</td>
-                    <td class="p-3">${dev.ramTotal >= 1024 ? (dev.ramTotal/1024).toFixed(1) + ' ГБ' : dev.ramTotal + ' МБ'}</td>
-                    <td class="p-3 font-bold text-green-700 bg-green-50/50">~${dev.ramAvail >= 1024 ? (dev.ramAvail/1024).toFixed(1) + ' ГБ' : dev.ramAvail + ' МБ'}</td>
-                    <td class="p-3 text-xs ${recColor}">${dev.rec}</td>
-                `;
+                    <td class="p-4"><span class="px-2 py-1 rounded text-[10px] font-black uppercase ${typeBadge}">${dev.type}</span></td>
+                    <td class="p-4 font-bold text-slate-900">${dev.name}</td>
+                    <td class="p-4 text-slate-400 text-[10px] font-medium italic">${dev.cpu}</td>
+                    <td class="p-4 font-medium">${dev.ramTotal >= 1024 ? (dev.ramTotal/1024).toFixed(1) + ' GB' : dev.ramTotal + ' MB'}</td>
+                    <td class="p-4 font-black text-green-700 bg-green-50/50 italic">~${dev.ramAvail >= 1024 ? (dev.ramAvail/1024).toFixed(1) + ' GB' : dev.ramAvail + ' MB'}</td>
+                    <td class="p-4 text-[11px] uppercase tracking-tight ${recClass}">${dev.rec}</td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        // Логика кнопок фильтра
         function filterTable(type) {
-            currentFilter = type;
-            
-            // Сброс стилей всех кнопок
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('bg-white', 'shadow', 'text-gray-800');
-                btn.classList.add('text-gray-600', 'hover:bg-white');
-            });
-
-            // Активная кнопка
-            const activeBtn = document.getElementById(`btn-${type}`);
-            activeBtn.classList.remove('text-gray-600', 'hover:bg-white');
-            activeBtn.classList.add('bg-white', 'shadow', 'text-gray-800');
-
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`btn-${type}`).classList.add('active');
             renderTable(type);
         }
 
-        // Инициализация
-        renderTable('Все');
+        renderTable('All');
 
-        // === ГРАФИК (Берем только актуальные/таргетные устройства для чистоты графика) ===
         const chartData = devices.filter(d => 
-            d.rec.includes('Таргет') || 
-            d.rec.includes('Флагман') || 
-            d.rec.includes('База пользователей') ||
-            d.rec.includes('База 2026')
+            d.rec.includes('Target') || d.rec.includes('Flagship') || d.rec.includes('Active') || d.rec.includes('Base 2026')
         );
         
         const ctx = document.getElementById('ramChart').getContext('2d');
@@ -236,38 +183,28 @@
                 labels: chartData.map(d => d.name),
                 datasets: [
                     {
-                        label: 'Доступно ИГРЕ (МБ)',
+                        label: 'Free Game Budget (MB)',
                         data: chartData.map(d => d.ramAvail),
-                        backgroundColor: 'rgba(34, 197, 94, 0.85)', // Зеленый
-                        borderRadius: { bottomLeft: 0, bottomRight: 0, topLeft: 4, topRight: 4 },
-                        borderWidth: 0
+                        backgroundColor: '#16a34a',
+                        borderRadius: { topLeft: 4, topRight: 4 }
                     },
                     {
-                        label: 'Занято Системой Amazon (МБ)',
+                        label: 'FireOS Overhead (MB)',
                         data: chartData.map(d => d.ramTotal - d.ramAvail),
-                        backgroundColor: 'rgba(203, 213, 225, 0.6)', // Серый
-                        borderRadius: { bottomLeft: 4, bottomRight: 4, topLeft: 0, topRight: 0 },
-                        borderWidth: 0
+                        backgroundColor: '#e2e8f0',
+                        borderRadius: { bottomLeft: 4, bottomRight: 4 }
                     }
                 ]
             },
             options: {
-                responsive: true,
-                maintainAspectRatio: false,
+                responsive: true, maintainAspectRatio: false,
                 scales: {
-                    x: { stacked: true, ticks: { font: { size: 10 }, maxRotation: 45, minRotation: 45 } },
-                    y: { stacked: true, title: { display: true, text: 'Объем памяти (МБ)', font: { size: 12 } } }
+                    x: { stacked: true, ticks: { font: { size: 9 }, maxRotation: 45, minRotation: 45 } },
+                    y: { stacked: true, title: { display: true, text: 'Memory Budget (MB)', font: { size: 11, weight: 'bold' } } }
                 },
                 plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        mode: 'index',
-                        callbacks: {
-                            label: function(context) {
-                                return context.dataset.label + ': ' + context.raw + ' МБ';
-                            }
-                        }
-                    }
+                    legend: { position: 'top', labels: { font: { size: 10, weight: 'bold' } } },
+                    tooltip: { mode: 'index' }
                 }
             }
         });
