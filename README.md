@@ -1,2 +1,25 @@
-# Amazon-Device-Support-Matrix
 Amazon Device Support Matrix
+
+A high-performance hardware database and interactive dashboard for Amazon Fire OS devices (Fire TV, Tablets, and Echo Show). Designed specifically for Unity developers to manage memory budgets and prevent OOM (Out of Memory) crashes.
+Live Dashboard
+Access the interactive matrix here: 👉 https://sinlessdevil.github.io/Amazon-Device-Support-Matrix/
+
+Project Goals
+- Developing for Amazon's ecosystem requires strict memory management. This project consolidates fragmented documentation into a single source of truth:
+- Memory Budgets: Real-world RAM available for the Unity Heap + Native layers.
+- Performance Tiers: Categorized hardware levels for easy quality settings adjustment.
+- SoC Specs: Quick reference for CPU and Chipset capabilities.
+
+Technical Insights
+- Performance Classification (Unity Tiers)
+- We categorize devices into four tiers to simplify graphics optimization:
+
+---
+
+Tier Available RAM Strategy
+- Ultra > 2.0 GB High-res textures (2K), complex shaders, no limitations.
+- High 1.5 - 2.0 GB Stable performance, standard 1K textures.
+- Mid 1.0 - 1.5 GB Balanced tier, use ASTC compression, monitor draw calls.
+- Low < 850 MB Legacy hardware. Aggressive asset streaming and texture downscaling required.
+
+---
