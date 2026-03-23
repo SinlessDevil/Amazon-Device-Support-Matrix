@@ -1,8 +1,9 @@
-Amazon Device Support Matrix
+# Amazon Device Support Matrix
 
 A high-performance hardware database and interactive dashboard for Amazon Fire OS devices (Fire TV, Tablets, and Echo Show). Designed specifically for Unity developers to manage memory budgets and prevent OOM (Out of Memory) crashes.
 Live Dashboard
-Access the interactive matrix here: 👉 https://sinlessdevil.github.io/Amazon-Device-Support-Matrix/
+
+### Access the interactive matrix here: 👉 https://sinlessdevil.github.io/Amazon-Device-Support-Matrix/
 
 Project Goals
 - Developing for Amazon's ecosystem requires strict memory management. This project consolidates fragmented documentation into a single source of truth:
@@ -22,5 +23,4 @@ Tier Available RAM Strategy
 - Mid 1.0 - 1.5 GB Balanced tier, use ASTC compression, monitor draw calls.
 - Low < 850 MB Legacy hardware. Aggressive asset streaming and texture downscaling required.
 
----
 <img width="2132" height="1261" alt="image" src="https://github.com/user-attachments/assets/54b2c43a-1b21-43f3-925c-99c9ce96e066" />
