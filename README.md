@@ -5,16 +5,6 @@ Live Dashboard
 
 ### Access the interactive matrix here: 👉 https://sinlessdevil.github.io/Amazon-Device-Support-Matrix/
 
-Project Goals
-- Developing for Amazon's ecosystem requires strict memory management. This project consolidates fragmented documentation into a single source of truth:
-- Memory Budgets: Real-world RAM available for the Unity Heap + Native layers.
-- Performance Tiers: Categorized hardware levels for easy quality settings adjustment.
-- SoC Specs: Quick reference for CPU and Chipset capabilities.
-
-Technical Insights
-- Performance Classification (Unity Tiers)
-- We categorize devices into four tiers to simplify graphics optimization:
-
 ---
 
 Tier Available RAM Strategy
