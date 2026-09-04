@@ -3,71 +3,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amazon Fire Device Matrix | 2026 Ultimate Edition</title>
+    <title>Amazon Device Support Matrix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f0f2f5; color: #1e293b; }
-        .card { background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); padding: 24px; border: 1px solid #e2e8f0; }
-        
+        body { font-family: 'Inter', sans-serif; background-color: #f9f9f7; color: #0b0b0b; }
+        .card { background: #fcfcfb; border-radius: 16px; box-shadow: 0 4px 20px rgba(11,11,11,0.05); padding: 24px; border: 1px solid #e1e0d9; }
+
         .table-container::-webkit-scrollbar { height: 8px; width: 8px; }
         .table-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 4px; }
-        .table-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        
-        .filter-btn.active { background-color: #0f172a; color: white; transform: translateY(-1px); }
+        .table-container::-webkit-scrollbar-thumb { background: #c3c2b7; border-radius: 4px; }
+
+        .filter-btn.active { background-color: #0b0b0b; color: white; transform: translateY(-1px); }
+        .tab-btn.active { background-color: #2a78d6; color: white; }
         th { cursor: pointer; user-select: none; transition: background 0.2s; }
         th:hover { background-color: #f8fafc; }
+        th.sorted { color: #2a78d6; }
+
+        /* Categorical badges — fixed hue order per dataviz skill: blue, aqua, yellow, green, violet */
+        .badge-TV       { background: #2a78d61a; color: #184f95; }
+        .badge-Tablet   { background: #1baf7a1a; color: #0d6e4c; }
+        .badge-SmartTV  { background: #eda1001a; color: #8a5e00; }
+        .badge-EchoShow { background: #0083001a; color: #006300; }
+        .badge-Other    { background: #4a3aa71a; color: #4a3aa7; }
 
         .vega-badge { background: linear-gradient(90deg, #4f46e5, #9333ea); color: white; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
-        .android-badge { background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
-        
-        .pop-high { color: #16a34a; font-weight: 800; }
-        .pop-med { color: #ca8a04; font-weight: 800; }
-        .pop-low { color: #94a3b8; font-weight: 800; }
+        .fireos-badge { background: #e2e8f0; color: #475569; padding: 2px 6px; border-radius: 4px; font-size: 9px; font-weight: 800; }
+
+        /* Priority = status semantics (good/warning/muted), reserved separately from category hues */
+        .prio-High   { color: #0ca30c; font-weight: 800; }
+        .prio-Medium { color: #b8860b; font-weight: 800; }
+        .prio-Low    { color: #898781; font-weight: 800; }
+
+        /* RAM tier = ordinal single-hue ramp (blue), darker = more constrained */
+        .tier-Ultra { color: #5598e7; font-weight: 800; }
+        .tier-High  { color: #2a78d6; font-weight: 800; }
+        .tier-Mid   { color: #1c5cab; font-weight: 800; }
+        .tier-Low   { color: #104281; font-weight: 800; }
+
+        .conf-flag { color: #898781; cursor: help; font-weight: 700; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div class="max-w-7xl mx-auto space-y-6">
-        
+
         <!-- Header -->
         <div class="flex flex-col md:flex-row justify-between items-center bg-white p-8 rounded-2xl border border-slate-200 shadow-sm gap-6">
             <div class="text-center md:text-left">
                 <h1 class="text-3xl md:text-5xl font-black text-slate-900 tracking-tighter uppercase italic">
-                    <span class="text-blue-600">Amazon</span> Matrix 2026
+                    <span class="text-blue-600">Amazon</span> Device Matrix
                 </h1>
-                <p class="text-slate-500 font-medium mt-2">Ultimate Hardware Database: Fire TV & Tablets (44 Devices)</p>
+                <p class="text-slate-500 font-medium mt-2">Fire OS &amp; Vega OS hardware database — Fire TV, Tablets, Fire TV Edition Smart TVs, Echo Show &amp; more</p>
             </div>
             <div class="flex gap-4">
                 <div class="text-center bg-slate-50 p-4 rounded-xl border border-slate-100">
                     <span class="block text-2xl font-black text-indigo-600" id="deviceCount">0</span>
-                    <span class="text-[10px] uppercase font-bold text-slate-400">Devices Tracked</span>
+                    <span class="text-[10px] uppercase font-bold text-slate-400">Devices In View</span>
                 </div>
             </div>
+        </div>
+
+        <!-- Year Tabs -->
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 bg-white p-3 rounded-2xl border border-slate-200 shadow-sm">
+            <div class="flex gap-2 bg-slate-100 p-1 rounded-xl">
+                <button onclick="setYearView('2026')" id="tab-2026" class="tab-btn px-4 py-2 text-xs font-black rounded-lg uppercase tracking-wide">2026 (Current Year)</button>
+                <button onclick="setYearView('all')" id="tab-all" class="tab-btn active px-4 py-2 text-xs font-black rounded-lg uppercase tracking-wide">All-Time Archive (2011–2025)</button>
+            </div>
+            <p class="text-xs text-slate-400 font-medium px-2" id="tabNote">Showing every device ever tracked, launched before 2026.</p>
         </div>
 
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div class="card border-t-4 border-indigo-500">
-                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Top Userbase (TV)</h3>
-                <p class="text-xl font-bold mt-1">4K Max / Stick 4K</p>
-                <p class="text-sm text-slate-500 mt-2 font-medium">Market Share: ~45%<br>Target: High Priority</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Most Constrained Device</h3>
+                <p class="text-xl font-bold mt-1" id="kpiConstrained">—</p>
+                <p class="text-sm text-slate-500 mt-2 font-medium" id="kpiConstrainedSub">—</p>
             </div>
             <div class="card border-t-4 border-blue-500">
-                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Top Userbase (Tablets)</h3>
-                <p class="text-xl font-bold mt-1">Fire HD 10 / HD 8</p>
-                <p class="text-sm text-slate-500 mt-2 font-medium">Market Share: ~38%<br>Target: Essential</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Categories Covered</h3>
+                <p class="text-xl font-bold mt-1" id="kpiCategories">—</p>
+                <p class="text-sm text-slate-500 mt-2 font-medium">TV · Tablet · Smart TV · Echo Show · Other</p>
             </div>
             <div class="card border-t-4 border-orange-500">
-                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Low-End Bottleneck</h3>
-                <p class="text-xl font-bold mt-1">Stick G3 / Lite</p>
-                <p class="text-sm text-slate-500 mt-2 font-medium">RAM: 1 GB<br>Status: Critical Optimization</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Low RAM-Tier Devices</h3>
+                <p class="text-xl font-bold mt-1" id="kpiLowTier">—</p>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Est. free RAM &lt; 850 MB — aggressive optimization required</p>
             </div>
             <div class="card border-t-4 border-green-500">
-                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">Premium Segment</h3>
-                <p class="text-xl font-bold mt-1">Cube G3 / Max 11</p>
-                <p class="text-sm text-slate-500 mt-2 font-medium">RAM: 2-4 GB<br>Status: Enthusiast Tier</p>
+                <h3 class="text-xs text-slate-400 font-bold uppercase tracking-wider">High-Priority Devices</h3>
+                <p class="text-xl font-bold mt-1" id="kpiHighPriority">—</p>
+                <p class="text-sm text-slate-500 mt-2 font-medium">Widest install base — test these first</p>
             </div>
         </div>
 
@@ -76,11 +103,11 @@
             <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h2 class="text-xl font-extrabold text-slate-800">Visual Insights</h2>
-                    <p class="text-sm text-slate-500">Analyze RAM vs Market Popularity</p>
+                    <p class="text-sm text-slate-500">Based on the devices currently in view (tab + filters below)</p>
                 </div>
                 <div class="flex gap-2 bg-slate-100 p-1 rounded-lg">
-                    <button id="showRam" onclick="updateChart('ram')" class="px-3 py-1 text-xs font-bold rounded-md bg-white shadow-sm">RAM Layout</button>
-                    <button id="showPop" onclick="updateChart('pop')" class="px-3 py-1 text-xs font-bold rounded-md text-slate-600">Popularity & Sales</button>
+                    <button id="showRam" onclick="updateChart('ram')" class="px-3 py-1 text-xs font-bold rounded-md bg-white shadow-sm">Most Constrained</button>
+                    <button id="showTier" onclick="updateChart('tier')" class="px-3 py-1 text-xs font-bold rounded-md text-slate-600">RAM Tier Mix</button>
                 </div>
             </div>
             <div class="relative h-80 w-full">
@@ -93,33 +120,35 @@
             <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center mb-8 gap-4">
                 <div>
                     <h2 class="text-xl font-extrabold text-slate-800 uppercase tracking-tighter">Full Hardware Database</h2>
-                    <p class="text-sm text-slate-500 italic">Complete history from 2011 to 2026. Click headers to sort.</p>
+                    <p class="text-sm text-slate-500 italic">Click headers to sort. <sup class="conf-flag" title="Spec cross-referenced from community/teardown sources, not Amazon's official device-specs pages.">†</sup> = lower-confidence spec.</p>
                 </div>
-                
+
                 <div class="flex flex-wrap items-center gap-4">
                     <input type="text" id="searchInput" onkeyup="handleSearch()" placeholder="Search model, year, OS..." class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:bg-white focus:ring-2 focus:ring-blue-500 outline-none w-full md:w-64">
-                    
-                    <div class="flex gap-1 bg-slate-100 p-1 rounded-xl">
-                        <button onclick="filterTable('All')" id="btn-All" class="filter-btn active px-4 py-2 text-xs font-bold rounded-lg transition-all uppercase">All</button>
-                        <button onclick="filterTable('TV')" id="btn-TV" class="filter-btn px-4 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">TV</button>
-                        <button onclick="filterTable('Tablet')" id="btn-Tablet" class="filter-btn px-4 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Tablets</button>
-                        <button onclick="filterTable('Other')" id="btn-Other" class="filter-btn px-4 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Misc</button>
+
+                    <div class="flex flex-wrap gap-1 bg-slate-100 p-1 rounded-xl">
+                        <button onclick="filterTable('All')" id="btn-All" class="filter-btn active px-3 py-2 text-xs font-bold rounded-lg transition-all uppercase">All</button>
+                        <button onclick="filterTable('TV')" id="btn-TV" class="filter-btn px-3 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">TV</button>
+                        <button onclick="filterTable('Tablet')" id="btn-Tablet" class="filter-btn px-3 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Tablet</button>
+                        <button onclick="filterTable('SmartTV')" id="btn-SmartTV" class="filter-btn px-3 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Smart TV</button>
+                        <button onclick="filterTable('EchoShow')" id="btn-EchoShow" class="filter-btn px-3 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Echo Show</button>
+                        <button onclick="filterTable('Other')" id="btn-Other" class="filter-btn px-3 py-2 text-xs font-bold text-slate-600 rounded-lg transition-all uppercase">Other</button>
                     </div>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto table-container" style="max-height: 800px;">
                 <table class="min-w-full text-left border-collapse relative" id="deviceTable">
                     <thead class="sticky top-0 bg-slate-100 shadow-sm z-10">
                         <tr class="text-slate-500 text-[10px] uppercase tracking-widest font-black">
                             <th class="p-4 border-b">Cat.</th>
-                            <th class="p-4 border-b" onclick="sortTable(1)">Model ⇅</th>
+                            <th class="p-4 border-b" data-col="name">Model ⇅</th>
                             <th class="p-4 border-b">OS</th>
-                            <th class="p-4 border-b" onclick="sortTable(3)">Launch ⇅</th>
-                            <th class="p-4 border-b" onclick="sortTable(4)">RAM ⇅</th>
-                            <th class="p-4 border-b text-blue-700 bg-blue-50/50" onclick="sortTable(5)">Free RAM ⇅</th>
-                            <th class="p-4 border-b" onclick="sortTable(6)">Popularity ⇅</th>
-                            <th class="p-4 border-b">Recommendation</th>
+                            <th class="p-4 border-b" data-col="year">Launch ⇅</th>
+                            <th class="p-4 border-b" data-col="ramTotal">RAM ⇅</th>
+                            <th class="p-4 border-b text-blue-700 bg-blue-50/50" data-col="ramAvail" title="Modeled estimate — Amazon does not publish an app-available RAM figure. Computed from total RAM using a per-OS-generation overhead ratio, not measured on-device.">Est. Free RAM ⇅ ⓘ</th>
+                            <th class="p-4 border-b" data-col="priorityRank" title="Qualitative signal based on device age, generation continuity and price tier — not an Amazon-published sales figure (Amazon does not disclose per-model sales).">Priority ⇅ ⓘ</th>
+                            <th class="p-4 border-b">RAM Tier &amp; Strategy</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody" class="text-sm text-slate-700">
@@ -127,209 +156,329 @@
                 </table>
             </div>
         </div>
+
+        <p class="text-center text-xs text-slate-400 pb-4">
+            RAM &amp; OS specs cross-referenced against Amazon's official developer.amazon.com device-specs pages where available.
+            "Est. Free RAM" and "Priority" are modeled/qualitative signals, not officially published figures — see column tooltips (ⓘ).
+        </p>
     </div>
 
     <script>
+        // === VERIFIED DEVICE DATA ===
+        // RAM totals and launch years cross-referenced against developer.amazon.com/docs/device-specs,
+        // Wikipedia hardware tables, and AFTVnews. Devices marked conf:'medium' rely on community
+        // teardown data because Amazon has not published an official spec page for them.
         const devices = [
-            // === 2025-2026 NEXT-GEN ===
-            { type: 'Other', name: 'Fire TV Ultra Cube', os: 'Vega OS', year: 2026, ramTotal: 4096, ramAvail: 2800, pop: 10, sales: '0.5M', rec: 'Next-Gen Flagship' },
-            { type: 'TV', name: 'Fire TV Stick 4K G3', os: 'Vega OS', year: 2025, ramTotal: 2560, ramAvail: 1500, pop: 15, sales: '1.2M', rec: 'Future Base' },
-            { type: 'Tablet', name: 'Fire HD 10 (G14)', os: 'FireOS 9', year: 2025, ramTotal: 3072, ramAvail: 2000, pop: 20, sales: '2.5M', rec: 'Mainstream 2025' },
-            { type: 'Tablet', name: 'Fire HD 8 (2024)', os: 'FireOS 8', year: 2024, ramTotal: 3072, ramAvail: 1950, pop: 25, sales: '3.1M', rec: 'Target Base' },
+            // === VEGA OS (confirmed shipping — the only two real Vega OS devices as of Sep 2026) ===
+            { type: 'TV', name: 'Fire TV Stick 4K Select', os: 'Vega OS 1.1', year: 2025, ramTotal: 1024, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick HD', os: 'Vega OS 1.1', year: 2026, ramTotal: 1024, conf: 'high', priority: 'High' },
 
-            // === FIRE TV STICKS ===
-            { type: 'TV', name: 'Fire TV Stick 4K Max (G2)', os: 'FireOS 8', year: 2023, ramTotal: 2048, ramAvail: 1200, pop: 85, sales: '32.5M', rec: 'Target Now' },
-            { type: 'TV', name: 'Fire TV Stick 4K Max (G1)', os: 'FireOS 7', year: 2021, ramTotal: 2048, ramAvail: 1150, pop: 80, sales: '29.1M', rec: 'Target Now' },
-            { type: 'TV', name: 'Fire TV Stick 4K (G2)', os: 'FireOS 8', year: 2023, ramTotal: 2048, ramAvail: 1100, pop: 90, sales: '48.2M', rec: 'Target Now' },
-            { type: 'TV', name: 'Fire TV Stick 4K (G1)', os: 'FireOS 6', year: 2018, ramTotal: 1536, ramAvail: 750, pop: 95, sales: '65.0M', rec: 'Essential Base' },
-            { type: 'TV', name: 'Fire TV Stick (G3)', os: 'FireOS 7', year: 2020, ramTotal: 1024, ramAvail: 450, pop: 90, sales: '55.4M', rec: 'Bottom Base' },
-            { type: 'TV', name: 'Fire TV Stick Lite', os: 'FireOS 7', year: 2020, ramTotal: 1024, ramAvail: 450, pop: 85, sales: '42.8M', rec: 'Bottom Base' },
-            { type: 'TV', name: 'Fire TV Stick (G2)', os: 'FireOS 5', year: 2016, ramTotal: 1024, ramAvail: 350, pop: 40, sales: '15.2M', rec: 'End of Life' },
-            { type: 'TV', name: 'Fire TV Stick (G1)', os: 'FireOS 5', year: 2014, ramTotal: 1024, ramAvail: 300, pop: 5, sales: '8.0M', rec: 'Obsolete' },
-            { type: 'TV', name: 'Fire TV Stick Basic', os: 'FireOS 5', year: 2017, ramTotal: 1024, ramAvail: 320, pop: 10, sales: '4.5M', rec: 'Legacy' },
-            
+            // === FIRE TV STICKS (FireOS) ===
+            { type: 'TV', name: 'Fire TV Stick 4K Plus', os: 'FireOS 8', year: 2025, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick 4K Max (G2)', os: 'FireOS 8', year: 2023, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick 4K Max (G1)', os: 'FireOS 7', year: 2021, ramTotal: 2048, conf: 'high', priority: 'Medium' },
+            { type: 'TV', name: 'Fire TV Stick 4K (G2)', os: 'FireOS 8', year: 2023, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick 4K (G1)', os: 'FireOS 6', year: 2018, ramTotal: 1536, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick (G3)', os: 'FireOS 7', year: 2020, ramTotal: 1024, conf: 'high', priority: 'High' },
+            { type: 'TV', name: 'Fire TV Stick Lite', os: 'FireOS 7', year: 2020, ramTotal: 1024, conf: 'high', priority: 'Medium' },
+            { type: 'TV', name: 'Fire TV Stick (G2)', os: 'FireOS 5', year: 2016, ramTotal: 1024, conf: 'high', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV Stick (G1)', os: 'FireOS 5', year: 2014, ramTotal: 1024, conf: 'medium', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV Stick Basic Edition', os: 'FireOS 5', year: 2017, ramTotal: 1024, conf: 'high', priority: 'Low' },
+
             // === FIRE TV BOXES/CUBES ===
-            { type: 'TV', name: 'Fire TV Cube (G3)', os: 'FireOS 7', year: 2022, ramTotal: 2048, ramAvail: 1250, pop: 30, sales: '4.2M', rec: 'Strong Perf' },
-            { type: 'TV', name: 'Fire TV Cube (G2)', os: 'FireOS 7', year: 2019, ramTotal: 2048, ramAvail: 1150, pop: 25, sales: '3.5M', rec: 'Strong Perf' },
-            { type: 'TV', name: 'Fire TV Cube (G1)', os: 'FireOS 6', year: 2018, ramTotal: 2048, ramAvail: 1100, pop: 10, sales: '1.8M', rec: 'Maintenance' },
-            { type: 'TV', name: 'Fire TV (G3 Pendant)', os: 'FireOS 6', year: 2017, ramTotal: 2048, ramAvail: 1100, pop: 15, sales: '6.2M', rec: 'Maintenance' },
-            { type: 'TV', name: 'Fire TV (G2 Box)', os: 'FireOS 5', year: 2015, ramTotal: 2048, ramAvail: 1100, pop: 5, sales: '3.1M', rec: 'Legacy' },
-            { type: 'TV', name: 'Fire TV (G1 Box)', os: 'FireOS 5', year: 2014, ramTotal: 2048, ramAvail: 1100, pop: 2, sales: '2.5M', rec: 'Obsolete' },
+            { type: 'TV', name: 'Fire TV Cube (G3)', os: 'FireOS 7', year: 2022, ramTotal: 2048, conf: 'high', priority: 'Medium' },
+            { type: 'TV', name: 'Fire TV Cube (G2)', os: 'FireOS 7', year: 2019, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV Cube (G1)', os: 'FireOS 6', year: 2018, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV (G3 Pendant)', os: 'FireOS 6', year: 2017, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV (G2 Box)', os: 'FireOS 5', year: 2015, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'TV', name: 'Fire TV (G1 Box)', os: 'FireOS 5', year: 2014, ramTotal: 2048, conf: 'high', priority: 'Low' },
 
-            // === FIRE TABLETS HD 10 ===
-            { type: 'Tablet', name: 'Fire Max 11', os: 'FireOS 8', year: 2023, ramTotal: 4096, ramAvail: 2600, pop: 25, sales: '1.9M', rec: 'Flagship' },
-            { type: 'Tablet', name: 'Fire HD 10 Plus (G11)', os: 'FireOS 7', year: 2021, ramTotal: 4096, ramAvail: 2500, pop: 30, sales: '5.1M', rec: 'Premium' },
-            { type: 'Tablet', name: 'Fire HD 10 (G13)', os: 'FireOS 8', year: 2023, ramTotal: 3072, ramAvail: 1900, pop: 60, sales: '14.8M', rec: 'Essential' },
-            { type: 'Tablet', name: 'Fire HD 10 (G11)', os: 'FireOS 7', year: 2021, ramTotal: 3072, ramAvail: 1800, pop: 70, sales: '21.0M', rec: 'Essential' },
-            { type: 'Tablet', name: 'Fire HD 10 (G9)', os: 'FireOS 7', year: 2019, ramTotal: 2048, ramAvail: 1100, pop: 50, sales: '12.4M', rec: 'Base' },
-            { type: 'Tablet', name: 'Fire HD 10 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 2048, ramAvail: 1100, pop: 20, sales: '8.2M', rec: 'Legacy' },
-            { type: 'Tablet', name: 'Fire HD 10 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, ramAvail: 400, pop: 5, sales: '3.5M', rec: 'Obsolete' },
+            // === FIRE TABLETS — HD 10 / MAX 11 ===
+            { type: 'Tablet', name: 'Fire Max 11', os: 'FireOS 8', year: 2023, ramTotal: 4096, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 10 Plus (G11)', os: 'FireOS 7', year: 2021, ramTotal: 4096, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 10 (G13)', os: 'FireOS 8', year: 2023, ramTotal: 3072, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire HD 10 (G11)', os: 'FireOS 7', year: 2021, ramTotal: 3072, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire HD 10 (G9)', os: 'FireOS 7', year: 2019, ramTotal: 2048, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 10 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Fire HD 10 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, conf: 'high', priority: 'Low' },
 
-            // === FIRE TABLETS HD 8 ===
-            { type: 'Tablet', name: 'Fire HD 8 Plus (G12)', os: 'FireOS 7', year: 2022, ramTotal: 3072, ramAvail: 1900, pop: 40, sales: '6.4M', rec: 'Active' },
-            { type: 'Tablet', name: 'Fire HD 8 (G12)', os: 'FireOS 7', year: 2022, ramTotal: 2048, ramAvail: 1100, pop: 65, sales: '18.7M', rec: 'Essential' },
-            { type: 'Tablet', name: 'Fire HD 8 Plus (G10)', os: 'FireOS 7', year: 2020, ramTotal: 3072, ramAvail: 1850, pop: 35, sales: '5.2M', rec: 'Active' },
-            { type: 'Tablet', name: 'Fire HD 8 (G10)', os: 'FireOS 7', year: 2020, ramTotal: 2048, ramAvail: 1100, pop: 70, sales: '24.5M', rec: 'Essential' },
-            { type: 'Tablet', name: 'Fire HD 8 (G8)', os: 'FireOS 6', year: 2018, ramTotal: 1536, ramAvail: 750, pop: 45, sales: '11.3M', rec: 'Legacy' },
-            { type: 'Tablet', name: 'Fire HD 8 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 1536, ramAvail: 700, pop: 25, sales: '7.4M', rec: 'Legacy' },
-            { type: 'Tablet', name: 'Fire HD 8 (G6)', os: 'FireOS 5', year: 2016, ramTotal: 1536, ramAvail: 700, pop: 10, sales: '4.8M', rec: 'Legacy' },
-            { type: 'Tablet', name: 'Fire HD 8 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, ramAvail: 450, pop: 5, sales: '2.1M', rec: 'Obsolete' },
+            // === FIRE TABLETS — HD 8 ===
+            { type: 'Tablet', name: 'Fire HD 8 (2024)', os: 'FireOS 8', year: 2024, ramTotal: 3072, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire HD 8 Plus (2024)', os: 'FireOS 8', year: 2024, ramTotal: 4096, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 8 Plus (G12)', os: 'FireOS 7', year: 2022, ramTotal: 3072, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 8 (G12)', os: 'FireOS 7', year: 2022, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire HD 8 Plus (G10)', os: 'FireOS 7', year: 2020, ramTotal: 3072, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 8 (G10)', os: 'FireOS 7', year: 2020, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire HD 8 (G8)', os: 'FireOS 6', year: 2018, ramTotal: 1536, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire HD 8 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 1536, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Fire HD 8 (G6)', os: 'FireOS 5', year: 2016, ramTotal: 1536, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Fire HD 8 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, conf: 'high', priority: 'Low' },
 
-            // === FIRE TABLETS 7 ===
-            { type: 'Tablet', name: 'Fire 7 (G12)', os: 'FireOS 8', year: 2022, ramTotal: 2048, ramAvail: 1100, pop: 75, sales: '22.3M', rec: 'Critical Base' },
-            { type: 'Tablet', name: 'Fire 7 (G9)', os: 'FireOS 6', year: 2019, ramTotal: 1024, ramAvail: 400, pop: 60, sales: '19.4M', rec: 'Bottleneck' },
-            { type: 'Tablet', name: 'Fire 7 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 1024, ramAvail: 350, pop: 30, sales: '11.5M', rec: 'Obsolete' },
-            { type: 'Tablet', name: 'Fire 7 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, ramAvail: 300, pop: 10, sales: '14.2M', rec: 'Obsolete' },
+            // === FIRE TABLETS — 7" ===
+            { type: 'Tablet', name: 'Fire 7 (G12)', os: 'FireOS 8', year: 2022, ramTotal: 2048, conf: 'high', priority: 'High' },
+            { type: 'Tablet', name: 'Fire 7 (G9)', os: 'FireOS 6', year: 2019, ramTotal: 1024, conf: 'high', priority: 'Medium' },
+            { type: 'Tablet', name: 'Fire 7 (G7)', os: 'FireOS 5', year: 2017, ramTotal: 1024, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Fire 7 (G5)', os: 'FireOS 5', year: 2015, ramTotal: 1024, conf: 'high', priority: 'Low' },
 
             // === CLASSIC KINDLE FIRE / HDX ===
-            { type: 'Tablet', name: 'Fire HDX 8.9 (G4)', os: 'FireOS 4', year: 2014, ramTotal: 2048, ramAvail: 1000, pop: 2, sales: '1.2M', rec: 'Museum' },
-            { type: 'Tablet', name: 'Fire HD 7 (G4)', os: 'FireOS 4', year: 2014, ramTotal: 1024, ramAvail: 300, pop: 1, sales: '3.4M', rec: 'Museum' },
-            { type: 'Tablet', name: 'Kindle Fire HDX (G3)', os: 'FireOS 3', year: 2013, ramTotal: 2048, ramAvail: 1000, pop: 1, sales: '2.8M', rec: 'Museum' },
-            { type: 'Tablet', name: 'Kindle Fire HD (G2)', os: 'FireOS 2', year: 2012, ramTotal: 1024, ramAvail: 250, pop: 0, sales: '4.1M', rec: 'Obsolete' },
-            { type: 'Tablet', name: 'Kindle Fire (G1)', os: 'Android 2.3', year: 2011, ramTotal: 512, ramAvail: 100, pop: 0, sales: '5.0M', rec: 'Obsolete' },
+            { type: 'Tablet', name: 'Fire HDX 8.9 (G4)', os: 'FireOS 4', year: 2014, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Fire HD 7 (G4)', os: 'FireOS 4', year: 2014, ramTotal: 1024, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Kindle Fire HDX (G3)', os: 'FireOS 3', year: 2013, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'Tablet', name: 'Kindle Fire HD (G2)', os: 'FireOS 2', year: 2012, ramTotal: 1024, conf: 'medium', priority: 'Low' },
+            { type: 'Tablet', name: 'Kindle Fire (G1)', os: 'Android 2.3', year: 2011, ramTotal: 512, conf: 'high', priority: 'Low' },
 
-            // === SPECIALTY ===
-            { type: 'Other', name: 'Echo Show 21', os: 'Vega OS', year: 2024, ramTotal: 4096, ramAvail: 2500, pop: 15, sales: '0.8M', rec: 'Smart Home' },
-            { type: 'Other', name: 'Echo Show 15 (G2)', os: 'Vega OS', year: 2024, ramTotal: 3072, ramAvail: 1800, pop: 20, sales: '1.1M', rec: 'Smart Home' },
-            { type: 'Other', name: 'BMW In-Car Theater', os: 'FireOS 7', year: 2023, ramTotal: 2048, ramAvail: 1100, pop: 5, sales: '0.1M', rec: 'Automotive' }
+            // === FIRE TV EDITION SMART TVs (built-in Fire TV OS, not a stick) ===
+            { type: 'SmartTV', name: 'Fire TV Omni QLED Series (2025)', os: 'FireOS 8', year: 2025, ramTotal: 2560, conf: 'high', priority: 'Medium' },
+            { type: 'SmartTV', name: 'Fire TV Omni QLED Series (2022)', os: 'FireOS 7', year: 2022, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'Fire TV 4-Series (2025)', os: 'FireOS 8', year: 2025, ramTotal: 2560, conf: 'high', priority: 'Medium' },
+            { type: 'SmartTV', name: 'Fire TV 2-Series (2025)', os: 'FireOS 8', year: 2025, ramTotal: 2048, conf: 'high', priority: 'Medium' },
+            { type: 'SmartTV', name: 'Fire TV 2-Series (2023)', os: 'FireOS 7', year: 2023, ramTotal: 2048, conf: 'medium', priority: 'Low' },
+            { type: 'SmartTV', name: 'Toshiba 4K Fire TV Edition (2022)', os: 'FireOS 7', year: 2022, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'Toshiba 4K Fire TV Edition (2021)', os: 'FireOS 7', year: 2021, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'Panasonic 4K Fire TV Edition (MX800)', os: 'FireOS 8', year: 2023, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'JVC 4K Fire TV Edition', os: 'FireOS 7', year: 2021, ramTotal: 2048, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'JVC 2K Fire TV Edition', os: 'FireOS 6', year: 2020, ramTotal: 1536, conf: 'high', priority: 'Low' },
+            { type: 'SmartTV', name: 'Insignia 4K Fire TV Edition', os: 'FireOS 7', year: 2021, ramTotal: 2048, conf: 'medium', priority: 'Low' },
+            { type: 'SmartTV', name: 'Insignia Fire TV Edition (HD)', os: 'FireOS 6', year: 2020, ramTotal: 1024, conf: 'medium', priority: 'Low' },
+
+            // === ECHO SHOW (smart displays running FireOS) ===
+            { type: 'EchoShow', name: 'Echo Show 21', os: 'FireOS 7', year: 2024, ramTotal: 4096, conf: 'high', priority: 'Low' },
+            { type: 'EchoShow', name: 'Echo Show 15 (G2)', os: 'FireOS 7', year: 2024, ramTotal: 3072, conf: 'high', priority: 'Medium' },
+            { type: 'EchoShow', name: 'Echo Show 15 (G1)', os: 'FireOS 7', year: 2021, ramTotal: 3072, conf: 'high', priority: 'Low' },
+            { type: 'EchoShow', name: 'Echo Show 8 (G3)', os: 'FireOS 7', year: 2023, ramTotal: 2048, conf: 'high', priority: 'Medium' },
+            { type: 'EchoShow', name: 'Echo Show 8 (G2)', os: 'FireOS 7', year: 2021, ramTotal: 2048, conf: 'medium', priority: 'Medium' },
+            { type: 'EchoShow', name: 'Echo Show 8 (G1)', os: 'FireOS 7', year: 2019, ramTotal: 2048, conf: 'medium', priority: 'Low' },
+            { type: 'EchoShow', name: 'Echo Show 5 (G2)', os: 'FireOS 7', year: 2021, ramTotal: 1024, conf: 'medium', priority: 'High' },
+            { type: 'EchoShow', name: 'Echo Show 5 (G1)', os: 'FireOS 7', year: 2019, ramTotal: 1024, conf: 'medium', priority: 'Medium' },
+
+            // === OTHER (Fire TV Edition soundbars) ===
+            { type: 'Other', name: 'Nebula Soundbar (Fire TV Edition)', os: 'FireOS 6', year: 2019, ramTotal: 1536, conf: 'high', priority: 'Low' },
+            { type: 'Other', name: 'TCL Alto 8+ Soundbar (Fire TV Edition)', os: 'FireOS 6', year: 2019, ramTotal: 1536, conf: 'high', priority: 'Low' },
         ];
 
+        // === MODELED "AVAILABLE RAM" ESTIMATE ===
+        // Amazon does not publish an app-available RAM figure — only total RAM.
+        // This models free RAM as (total RAM x free ratio), where the ratio reflects
+        // each OS generation's typical background/system overhead. Newer OS versions
+        // are more memory-efficient, so the ratio rises with OS generation; Vega OS
+        // (a lighter, non-AOSP runtime) is modeled as the leanest.
+        const OS_FREE_RATIO = {
+            'Android 2.3': 0.20,
+            'FireOS 2': 0.25,
+            'FireOS 3': 0.30,
+            'FireOS 4': 0.33,
+            'FireOS 5': 0.38,
+            'FireOS 6': 0.47,
+            'FireOS 7': 0.56,
+            'FireOS 8': 0.60,
+            'Vega OS 1.1': 0.68,
+        };
+
+        const PRIORITY_RANK = { High: 3, Medium: 2, Low: 1 };
+
+        function estimateFreeRam(dev) {
+            const ratio = OS_FREE_RATIO[dev.os] ?? 0.5;
+            return Math.round(dev.ramTotal * ratio);
+        }
+
+        // RAM tier & strategy — mirrors the tier table documented in README.md
+        function getRamTier(freeRam) {
+            if (freeRam > 2000) return { key: 'Ultra', hint: 'No RAM ceiling — 2K textures, complex shaders OK' };
+            if (freeRam >= 1500) return { key: 'High', hint: 'Stable — standard 1K textures' };
+            if (freeRam >= 850) return { key: 'Mid', hint: 'Balanced — use ASTC compression, watch draw calls' };
+            return { key: 'Low', hint: 'Critical — aggressive streaming & texture downscaling required' };
+        }
+
+        // Precompute derived fields once
+        devices.forEach(d => {
+            d.ramAvail = estimateFreeRam(d);
+            d.tier = getRamTier(d.ramAvail);
+            d.priorityRank = PRIORITY_RANK[d.priority];
+        });
+
+        const CATEGORY_LABEL = { TV: 'TV', Tablet: 'Tablet', SmartTV: 'Smart TV', EchoShow: 'Echo Show', Other: 'Other' };
+
         let currentFilter = 'All';
+        let currentYearView = 'all'; // 'all' | '2026'
+        let sortState = { col: null, dir: 'asc' };
         let mainChart = null;
 
-        function getPopRating(val) {
-            if(val >= 70) return { label: 'HIGH', class: 'pop-high' };
-            if(val >= 30) return { label: 'MED', class: 'pop-med' };
-            return { label: 'LOW', class: 'pop-low' };
+        function getYearScoped() {
+            return currentYearView === '2026' ? devices.filter(d => d.year === 2026) : devices.filter(d => d.year < 2026);
+        }
+
+        function getVisibleDevices() {
+            const val = document.getElementById('searchInput').value.toLowerCase();
+            let list = getYearScoped().filter(d =>
+                (currentFilter === 'All' || d.type === currentFilter) &&
+                (d.name.toLowerCase().includes(val) || d.os.toLowerCase().includes(val) || d.year.toString().includes(val))
+            );
+            if (sortState.col) {
+                const col = sortState.col;
+                const dir = sortState.dir === 'asc' ? 1 : -1;
+                list = [...list].sort((a, b) => {
+                    let av = a[col], bv = b[col];
+                    if (typeof av === 'string') { av = av.toLowerCase(); bv = bv.toLowerCase(); }
+                    if (av < bv) return -1 * dir;
+                    if (av > bv) return 1 * dir;
+                    return 0;
+                });
+            }
+            return list;
+        }
+
+        function setYearView(view) {
+            currentYearView = view;
+            document.getElementById('tab-2026').classList.toggle('active', view === '2026');
+            document.getElementById('tab-all').classList.toggle('active', view === 'all');
+            document.getElementById('tabNote').textContent = view === '2026'
+                ? "Devices launched in 2026 so far. It's still early in the year, so this list is short by definition — check the archive tab for everything shipped to date."
+                : 'Showing every device ever tracked, launched before 2026.';
+            renderAll();
+        }
+
+        function getPriorityMeta(priority) {
+            return { label: priority.toUpperCase(), class: 'prio-' + priority };
         }
 
         function renderTable(data) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '';
-            document.getElementById('deviceCount').innerText = data.length;
-            
+
             data.forEach(dev => {
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 transition-colors border-b border-slate-100";
-                
-                let typeBadge = dev.type === 'TV' ? 'bg-blue-100 text-blue-800' : 
-                                dev.type === 'Tablet' ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800';
 
-                let osBadge = dev.os.includes('Vega') ? 'vega-badge' : 'android-badge';
-                let pop = getPopRating(dev.pop);
-
-                let recClass = 'text-slate-600 font-bold';
-                if(['Obsolete', 'Museum'].some(s => dev.rec.includes(s))) recClass = 'text-red-400';
-                if(['Target', 'Essential', 'Flagship', 'Future'].some(s => dev.rec.includes(s))) recClass = 'text-indigo-600 font-black';
-                if(['Active', 'Popular', 'Mainstream'].some(s => dev.rec.includes(s))) recClass = 'text-green-600';
+                const osBadgeClass = dev.os.includes('Vega') ? 'vega-badge' : 'fireos-badge';
+                const prio = getPriorityMeta(dev.priority);
+                const confFlag = dev.conf === 'medium' ? '<sup class="conf-flag" title="Spec cross-referenced from community/teardown sources, not Amazon\'s official device-specs pages.">†</sup>' : '';
 
                 tr.innerHTML = `
-                    <td class="p-4"><span class="px-2 py-1 rounded text-[9px] font-black uppercase ${typeBadge}">${dev.type}</span></td>
-                    <td class="p-4 font-extrabold text-slate-900">${dev.name}</td>
-                    <td class="p-4"><span class="${osBadge}">${dev.os}</span></td>
+                    <td class="p-4"><span class="px-2 py-1 rounded text-[9px] font-black uppercase badge-${dev.type}">${CATEGORY_LABEL[dev.type]}</span></td>
+                    <td class="p-4 font-extrabold text-slate-900">${dev.name}${confFlag}</td>
+                    <td class="p-4"><span class="${osBadgeClass}">${dev.os}</span></td>
                     <td class="p-4 text-slate-500 font-bold">${dev.year}</td>
                     <td class="p-4 font-bold text-slate-400">${dev.ramTotal} MB</td>
                     <td class="p-4 font-black text-blue-600 bg-blue-50/30 italic">~${dev.ramAvail} MB</td>
-                    <td class="p-4"><span class="${pop.class} text-[10px] tracking-tighter">${pop.label} (${dev.pop}%)</span></td>
-                    <td class="p-4 text-[10px] uppercase tracking-tighter ${recClass}">${dev.rec}</td>`;
+                    <td class="p-4"><span class="${prio.class} text-[10px] tracking-tighter">${prio.label}</span></td>
+                    <td class="p-4 text-[10px] uppercase tracking-tighter tier-${dev.tier.key}" title="${dev.tier.hint}">${dev.tier.key} — ${dev.tier.hint}</td>`;
                 tbody.appendChild(tr);
             });
+
+            document.getElementById('deviceCount').innerText = data.length;
         }
 
-        function handleSearch() {
-            const val = document.getElementById('searchInput').value.toLowerCase();
-            const filtered = devices.filter(d => 
-                (currentFilter === 'All' || d.type === currentFilter) && 
-                (d.name.toLowerCase().includes(val) || d.os.toLowerCase().includes(val) || d.year.toString().includes(val))
-            );
-            renderTable(filtered);
+        function renderKpis(data) {
+            if (data.length === 0) {
+                document.getElementById('kpiConstrained').innerText = '—';
+                document.getElementById('kpiConstrainedSub').innerText = 'No devices match this view';
+                document.getElementById('kpiCategories').innerText = '0';
+                document.getElementById('kpiLowTier').innerText = '0';
+                document.getElementById('kpiHighPriority').innerText = '0';
+                return;
+            }
+            const mostConstrained = [...data].sort((a, b) => a.ramAvail - b.ramAvail)[0];
+            document.getElementById('kpiConstrained').innerText = mostConstrained.name;
+            document.getElementById('kpiConstrainedSub').innerText = `~${mostConstrained.ramAvail} MB est. free RAM (${mostConstrained.os})`;
+            document.getElementById('kpiCategories').innerText = new Set(data.map(d => d.type)).size;
+            document.getElementById('kpiLowTier').innerText = data.filter(d => d.tier.key === 'Low').length;
+            document.getElementById('kpiHighPriority').innerText = data.filter(d => d.priority === 'High').length;
         }
+
+        function renderAll() {
+            const data = getVisibleDevices();
+            renderTable(data);
+            renderKpis(data);
+            updateChart(currentChartMode);
+        }
+
+        function handleSearch() { renderAll(); }
 
         function filterTable(type) {
             currentFilter = type;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(`btn-${type}`).classList.add('active');
-            handleSearch();
+            renderAll();
         }
 
-        function sortTable(n) {
-            const table = document.getElementById("deviceTable");
-            let rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-            switching = true;
-            dir = "desc"; 
-            while (switching) {
-                switching = false;
-                rows = table.rows;
-                for (i = 1; i < (rows.length - 1); i++) {
-                    shouldSwitch = false;
-                    x = rows[i].getElementsByTagName("TD")[n];
-                    y = rows[i + 1].getElementsByTagName("TD")[n];
-                    let xVal = x.innerText.toLowerCase();
-                    let yVal = y.innerText.toLowerCase();
-                    if (!isNaN(parseInt(xVal.replace(/\D/g,'')))) {
-                        xVal = parseInt(xVal.replace(/\D/g,''));
-                        yVal = parseInt(yVal.replace(/\D/g,''));
-                    }
-                    if (dir == "asc" ? xVal > yVal : xVal < yVal) { shouldSwitch = true; break; }
-                }
-                if (shouldSwitch) { rows[i].parentNode.insertBefore(rows[i + 1], rows[i]); switching = true; switchcount ++; }
-                if (switchcount == 0 && dir == "desc") { dir = "asc"; switching = true; }
+        function sortTable(col, thEl) {
+            if (sortState.col === col) {
+                sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortState.col = col;
+                sortState.dir = 'asc';
             }
+            document.querySelectorAll('#deviceTable th').forEach(th => th.classList.remove('sorted'));
+            thEl.classList.add('sorted');
+            renderAll();
         }
+
+        document.querySelectorAll('#deviceTable th[data-col]').forEach(th => {
+            th.addEventListener('click', () => sortTable(th.dataset.col, th));
+        });
+
+        let currentChartMode = 'ram';
 
         function updateChart(mode) {
+            currentChartMode = mode;
             const chartCtx = document.getElementById('mainChart').getContext('2d');
-            // Show top 15 most popular devices in the chart for clarity
-            const topDevices = [...devices].sort((a,b) => b.pop - a.pop).slice(0, 15);
-            
+            const data = getVisibleDevices();
+
             document.getElementById('showRam').className = mode === 'ram' ? 'px-3 py-1 text-xs font-bold rounded-md bg-white shadow-sm' : 'px-3 py-1 text-xs font-bold rounded-md text-slate-600';
-            document.getElementById('showPop').className = mode === 'pop' ? 'px-3 py-1 text-xs font-bold rounded-md bg-white shadow-sm' : 'px-3 py-1 text-xs font-bold rounded-md text-slate-600';
+            document.getElementById('showTier').className = mode === 'tier' ? 'px-3 py-1 text-xs font-bold rounded-md bg-white shadow-sm' : 'px-3 py-1 text-xs font-bold rounded-md text-slate-600';
 
-            if(mainChart) mainChart.destroy();
+            if (mainChart) mainChart.destroy();
 
-            const datasets = mode === 'ram' ? [
-                { label: 'Free RAM', data: topDevices.map(d => d.ramAvail), backgroundColor: '#4f46e5', borderRadius: 5 },
-                { label: 'OS Reserve', data: topDevices.map(d => d.ramTotal - d.ramAvail), backgroundColor: '#e2e8f0', borderRadius: 5 }
-            ] : [
-                { label: 'Market Share %', data: topDevices.map(d => d.pop), backgroundColor: '#10b981', borderRadius: 5 }
-            ];
-
-            mainChart = new Chart(chartCtx, {
-                type: 'bar',
-                data: {
-                    labels: topDevices.map(d => d.name),
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    scales: { 
-                        x: { stacked: mode === 'ram' }, 
-                        y: { stacked: mode === 'ram', beginAtZero: true } 
+            if (mode === 'ram') {
+                // Most memory-constrained devices in view — the ones that need optimization work first
+                const constrained = [...data].sort((a, b) => a.ramAvail - b.ramAvail).slice(0, 15);
+                mainChart = new Chart(chartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: constrained.map(d => d.name),
+                        datasets: [
+                            { label: 'Est. Free RAM', data: constrained.map(d => d.ramAvail), backgroundColor: '#2a78d6', borderRadius: 5 },
+                            { label: 'OS / System Reserve', data: constrained.map(d => d.ramTotal - d.ramAvail), backgroundColor: '#e1e0d9', borderRadius: 5 }
+                        ]
                     },
-                    plugins: { 
-                        legend: { position: 'bottom' },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const index = context.dataIndex;
-                                    const dev = topDevices[index];
-                                    if (mode === 'pop') {
-                                        return [`Share: ${dev.pop}%`, `Est. Sales: ${dev.sales}`];
-                                    }
-                                    return `${context.dataset.label}: ${context.raw} MB`;
-                                }
-                            }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } },
+                        plugins: {
+                            legend: { position: 'bottom' },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw} MB` } }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                // RAM tier distribution — how many tracked devices fall into each optimization bucket
+                const tierOrder = ['Low', 'Mid', 'High', 'Ultra'];
+                const tierColors = { Low: '#104281', Mid: '#1c5cab', High: '#2a78d6', Ultra: '#5598e7' };
+                const counts = tierOrder.map(t => data.filter(d => d.tier.key === t).length);
+                mainChart = new Chart(chartCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: tierOrder.map(t => t + ' tier'),
+                        datasets: [{ label: 'Devices', data: counts, backgroundColor: tierOrder.map(t => tierColors[t]), borderRadius: 5 }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { callbacks: { label: (ctx) => `${ctx.raw} device(s)` } }
+                        }
+                    }
+                });
+            }
         }
 
         // Run on load
         window.onload = () => {
-            renderTable(devices);
-            updateChart('ram');
+            setYearView('all');
         };
     </script>
 </body>
