@@ -6,7 +6,7 @@ A high-performance hardware database and interactive dashboard for Amazon Fire O
 
 Live Dashboard
 
-### Access the interactive matrix here: 👉 https://sinlessdevil.github.io/Amazon-Device-Support-Matrix/
+### Access the interactive matrix here: 👉 https://sinlessdevil.github.io/AmazonDeviceSupportMatrix/
 
 ---
 
