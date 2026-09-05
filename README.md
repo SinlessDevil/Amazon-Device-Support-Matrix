@@ -18,4 +18,4 @@ Tier Available RAM Strategy
 
 **Note on "available RAM":** Amazon only publishes total RAM per device, not an app-available figure. The site models free RAM as total RAM × a per-OS-generation overhead ratio (documented in `index.html`) — treat it as a directional estimate, not a measured value. Likewise, the "Priority" column is a qualitative signal (device age, generation continuity, price tier), not an Amazon sales figure — Amazon does not disclose per-model unit sales.
 
-<img width="2132" height="1261" alt="image" src="https://github.com/user-attachments/assets/54b2c43a-1b21-43f3-925c-99c9ce96e066" />
+<img width="2479" height="1296" alt="image" src="https://github.com/user-attachments/assets/a6f4d0c5-15cf-46b6-b056-03f12e061931" />
